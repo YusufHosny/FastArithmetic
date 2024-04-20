@@ -15,7 +15,7 @@ module mp_adder_TB();
   
   reg [OPERAND_WIDTH:0]  rExpectedResult;
   
-  mp_adder #( .OPERAND_WIDTH(OPERAND_WIDTH), .ADDER_WIDTH(ADDER_WIDTH) )
+  mp_adder #( .OPERAND_WIDTH(OPERAND_WIDTH), .ADDER_WIDTH(ADDER_WIDTH), .BLOCK_WIDTH(8) )
   mp_adder_INST
   ( .iClk(rClk), .iRst(rRst), .iStart(rStart), .iOpA(rA), .iOpB(rB), .oRes(wRes), .oDone(wDone) );
 

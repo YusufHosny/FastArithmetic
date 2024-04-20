@@ -94,13 +94,15 @@ module carry_save_accumulator
         
         // underlying adder can be changed
         // define adder types
-        localparam RCA =   3'b000;
-        localparam CBA =   3'b001;
-        localparam CLA =   3'b010;
-        localparam BCLA =  3'b011;
-        localparam CSelA = 3'b100;
-        localparam GFA =   3'b101;
-        localparam IGFA =  3'b110;
+        localparam RCA =   4'b0000;
+        localparam CBA =   4'b0001;
+        localparam CLA =   4'b0010;
+        localparam BCLA =  4'b0011;
+        localparam CSelA = 4'b0100;
+        localparam GFA =   4'b0101;
+        localparam IGFA =  4'b0110;
+        localparam RCACC = 4'b0111;
+        localparam CCA   =  4'b1000;
     
         mp_adder #(.OPERAND_WIDTH(OUTPUT_LENGTH), .ADDER_WIDTH(8), .ADDER_TYPE(CLA))
         adder_inst (

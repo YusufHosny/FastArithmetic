@@ -29,7 +29,7 @@ module carry_bypass_adder
 );
     
     // bus for carries
-    wire [WIDTH:0] wCs;
+    wire [WIDTH/BLOCK_WIDTH:0] wCs;
     assign wCs[0] = iC;
  
 

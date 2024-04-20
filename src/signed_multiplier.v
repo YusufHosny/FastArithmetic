@@ -39,13 +39,17 @@ module signed_multiplier
     genvar i;
     generate
         // generate +1 -1 +2 -2 operands
+        wire [INPUT_LENGTH-1:0] rawminuses [1:0];
         wire [OUTPUT_LENGTH-1:0] adds [2:0], minuses [2:0];
         assign adds[0] = 0;
         assign minuses[0] = 0;
         assign adds[1] = iA;
         assign adds[2] = iA << 1;
-        twos_complementer #(.WIDTH(OUTPUT_LENGTH)) comp1 (.iA(adds[1]), .oA(minuses[1]));
-        twos_complementer #(.WIDTH(OUTPUT_LENGTH)) comp2 (.iA(adds[2]), .oA(minuses[2]));
+        twos_complementer #(.WIDTH(INPUT_LENGTH)) comp1 (.iA(adds[1]), .oA(rawminuses[0]));
+        twos_complementer #(.WIDTH(INPUT_LENGTH)) comp2 (.iA(adds[2]), .oA(rawminuses[1]));
+        // sign extend
+        assign minuses[1] = {{(SIGN_PADDING-i){1'b1}}, rawminuses[0]}; 
+        assign minuses[2] = {{(SIGN_PADDING-i){1'b1}}, rawminuses[1]}; 
         
         // pad multiplier with a 0 to the right
         wire [INPUT_LENGTH:0] padded_multiplier;
@@ -68,8 +72,7 @@ module signed_multiplier
             // and sign extend negative partial product
             wire [OUTPUT_LENGTH-1:0] positive_partial_product, raw_negative_partial_product, negative_partial_product;
             assign positive_partial_product = adds[booth_encoded[1:0]] << (i-1);
-            assign raw_negative_partial_product = minuses[booth_encoded[1:0]] << (i-1); // without sign extension
-            assign negative_partial_product = {{(SIGN_PADDING-i){1'b1}}, raw_negative_partial_product}; // sign extended
+            assign negative_partial_product = minuses[booth_encoded[1:0]] << (i-1);
             
             // assign final partial product based on sign bit in booth encoding
             assign partial_products[(i-1)/2] = 

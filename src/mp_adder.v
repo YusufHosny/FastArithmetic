@@ -6,11 +6,11 @@ module mp_adder #(
     // if the operands you want to add have an OPERAND_WIDTH non-multiple of ADDER_WIDTH
     //   you'll have to extend them by padding them with zeroes
     parameter OPERAND_WIDTH = 1024,
-    parameter ADDER_WIDTH   = 256,
+    parameter ADDER_WIDTH   = 512,
     parameter N_ITERATIONS  = OPERAND_WIDTH / ADDER_WIDTH,
-    parameter ADDER_TYPE = 0,
-    parameter BLOCK_WIDTH = 16,
-    parameter SUB_BLOCK_WIDTH = 8
+    parameter ADDER_TYPE = 8,
+    parameter BLOCK_WIDTH = 64,
+    parameter SUB_BLOCK_WIDTH = 16
     )
     (
     input  wire                       iClk,
@@ -75,13 +75,15 @@ module mp_adder #(
     wire                    carry_out;
 
     // define adder types
-    localparam RCA =   3'b000;
-    localparam CBA =   3'b001;
-    localparam CLA =   3'b010;
-    localparam BCLA =  3'b011;
-    localparam CSelA = 3'b100;
-    localparam GFA =   3'b101;
-    localparam IGFA =  3'b110;
+    localparam RCA =   4'b0000;
+    localparam CBA =   4'b0001;
+    localparam CLA =   4'b0010;
+    localparam BCLA =  4'b0011;
+    localparam CSelA = 4'b0100;
+    localparam GFA =   4'b0101;
+    localparam IGFA =  4'b0110;
+    localparam RCACC = 4'b0111;
+    localparam CCA   =  4'b1000;
 
     case(ADDER_TYPE)
         RCA: begin
@@ -160,6 +162,29 @@ module mp_adder #(
                     .oC(carry_out)
                   );
         end
+        
+        RCACC: begin
+            rca_carry_chain #( .WIDTH(ADDER_WIDTH) ) 
+                adder_inst   (
+                    .iA( operandA ), 
+                    .iB( operandB ),
+                    .iC( carry_in ),
+                    .oS(result),
+                    .oC(carry_out)
+                  );
+        end
+        
+        CCA: begin
+            carry_chain_adder #( .WIDTH(ADDER_WIDTH), .BLOCK_WIDTH(BLOCK_WIDTH) ) 
+                adder_inst   (
+                    .iA( operandA ), 
+                    .iB( operandB ),
+                    .iC( carry_in ),
+                    .oS(result),
+                    .oC(carry_out)
+                  );
+        end
+        
     endcase
 
 

@@ -17,3 +17,7 @@ FastArithmetic is a small collection of Verilog modules and testbenches, made fo
 - Single Cycle Unsigned Multiplier with Carry Save Adders
 - Single Cycle Signed Multiplier with Radix-4 Booth Reduction
 - Multiply-Accumulator (MAC) with a multi-cycle Carry Propagate Step
+
+And for comparison, these are some adders using RTL add and Vivado optimizations
+- Ripple Carry Adder with Carry4 Blocks (RCA_carry_chain)
+- Carry Select Adder with Carry4 Blocks (carry_chain_adder)
