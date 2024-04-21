@@ -15,7 +15,18 @@ module mp_adder_TB();
   
   reg [OPERAND_WIDTH:0]  rExpectedResult;
   
-  mp_adder #( .OPERAND_WIDTH(OPERAND_WIDTH), .ADDER_WIDTH(ADDER_WIDTH), .BLOCK_WIDTH(8) )
+  // define adder types
+    localparam RCA =   4'b0000;
+    localparam CBA =   4'b0001;
+    localparam CLA =   4'b0010;
+    localparam BCLA =  4'b0011;
+    localparam CSelA = 4'b0100;
+    localparam GFA =   4'b0101;
+    localparam IGFA =  4'b0110;
+    localparam RCACC = 4'b0111;
+    localparam CCA   =  4'b1000;
+  
+  mp_adder #( .OPERAND_WIDTH(OPERAND_WIDTH), .ADDER_WIDTH(ADDER_WIDTH), .BLOCK_WIDTH(8), .SUB_BLOCK_WIDTH(4), .ADDER_TYPE(CCA) )
   mp_adder_INST
   ( .iClk(rClk), .iRst(rRst), .iStart(rStart), .iOpA(rA), .iOpB(rB), .oRes(wRes), .oDone(wDone) );
 
@@ -43,8 +54,8 @@ module mp_adder_TB();
       #(5*T);
       
       rStart = 1;
-      rA <= 128'h12121212_34343434_56565656_78787878;
-      rB <= 128'hefefefef_cdcdcdcd_abababab_90909090;
+      rA <= 128'hffffffff_ffffffff_fffff0ff_0fffff00;
+      rB <= 128'hffffffff_fffff0ff_ffffffff_0fffffff;
       #T;
       rExpectedResult = rA + rB;
       rStart = 0;

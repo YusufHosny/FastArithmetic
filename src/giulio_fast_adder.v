@@ -31,14 +31,22 @@ module giulio_fast_adder
 );
     
     // wire for all carries, first carry assignment
-    wire [WIDTH/BLOCK_WIDTH:0] wCs;
-    assign wCs[0] = iC;
+    wire [WIDTH/BLOCK_WIDTH-1:0] wCs;
+    
+    carry_lookahead_adder #( .WIDTH(BLOCK_WIDTH) ) 
+            CLA   (
+                .iA( iA[0 +: BLOCK_WIDTH] ), 
+                .iB( iB[0 +: BLOCK_WIDTH] ),
+                .iC( iC ),
+                .oS(oS[0 +: BLOCK_WIDTH]),
+                .oC(wCs[0])
+              );
     
     genvar i;
     generate
         
         // generate CSelA blocks
-        for(i=0; i < WIDTH/BLOCK_WIDTH; i = i+1)
+        for(i=1; i < WIDTH/BLOCK_WIDTH; i = i+1)
         begin
             // output sum and carry wires for carry = 0 and carry = 1
             wire [BLOCK_WIDTH-1:0] wS0, wS1;
@@ -64,8 +72,8 @@ module giulio_fast_adder
               );
               
               // mux carry and sum
-              assign wCs[i+1] = (wCs[i] == 1) ? wC1 : wC0;
-              assign oS[i*BLOCK_WIDTH +: BLOCK_WIDTH] = (wCs[i] == 1) ? wS1 : wS0;
+              assign wCs[i] = (wCs[i-1] == 1) ? wC1 : wC0;
+              assign oS[i*BLOCK_WIDTH +: BLOCK_WIDTH] = (wCs[i-1] == 1) ? wS1 : wS0;
             
         end
        
@@ -73,6 +81,6 @@ module giulio_fast_adder
     
     
     // assign output as last carry
-    assign oC = wCs[WIDTH/BLOCK_WIDTH];
+    assign oC = wCs[WIDTH/BLOCK_WIDTH-1];
 
 endmodule
