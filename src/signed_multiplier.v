@@ -39,17 +39,17 @@ module signed_multiplier
     genvar i;
     generate
         // generate +1 -1 +2 -2 operands
-        wire [INPUT_LENGTH-1:0] rawminuses [1:0];
+        wire [INPUT_LENGTH:0] rawminuses [1:0];
         wire [OUTPUT_LENGTH-1:0] adds [2:0], minuses [2:0];
         assign adds[0] = 0;
         assign minuses[0] = 0;
         assign adds[1] = iA;
         assign adds[2] = iA << 1;
-        twos_complementer #(.WIDTH(INPUT_LENGTH)) comp1 (.iA(adds[1]), .oA(rawminuses[0]));
-        twos_complementer #(.WIDTH(INPUT_LENGTH)) comp2 (.iA(adds[2]), .oA(rawminuses[1]));
+        twos_complementer #(.WIDTH(INPUT_LENGTH+1)) comp1 (.iA(adds[1][INPUT_LENGTH:0]), .oA(rawminuses[0]));
+        twos_complementer #(.WIDTH(INPUT_LENGTH+1)) comp2 (.iA(adds[2][INPUT_LENGTH:0]), .oA(rawminuses[1]));
         // sign extend
-        assign minuses[1] = {{(SIGN_PADDING-i){1'b1}}, rawminuses[0]}; 
-        assign minuses[2] = {{(SIGN_PADDING-i){1'b1}}, rawminuses[1]}; 
+        assign minuses[1] = {{(SIGN_PADDING-1){1'b1}}, rawminuses[0]}; 
+        assign minuses[2] = {{(SIGN_PADDING-1){1'b1}}, rawminuses[1]}; 
         
         // pad multiplier with a 0 to the right
         wire [INPUT_LENGTH:0] padded_multiplier;
@@ -102,7 +102,7 @@ module signed_multiplier
         adder_inst   (
             .iA( wi1[N-2] ), 
             .iB( wi2[N-2][OUTPUT_LENGTH-1:0] ),
-            .iC( 0 ),
+            .iC( 1'b0 ),
             .oS( oRes ),
             .oC( carry_out )
           );

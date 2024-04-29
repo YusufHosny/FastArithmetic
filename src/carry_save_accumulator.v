@@ -63,7 +63,7 @@ module carry_save_accumulator
         
         // base case
         full_adder FA1
-            (.iA(rA[0]), .iB(accumulator[0][0]), .iCarry(0),.oCarry(accumulatorNext[0][1]), .oSum(accumulatorNext[0][0]));
+            (.iA(rA[0]), .iB(accumulator[0][0]), .iCarry(1'b0),.oCarry(accumulatorNext[0][1]), .oSum(accumulatorNext[0][0]));
        
        // adder blocks below input length
         for(i=1; i < INPUT_LENGTH; i = i+1)
@@ -111,6 +111,7 @@ module carry_save_accumulator
             .iStart( rStartProcess ),
             .iOpA( wOperandA ),
             .iOpB( wOperandB[OUTPUT_LENGTH-1:0] ),
+            .iSub(1'b0),
             .oRes( woResAdd ),
             .oDone( wProcessed )
         );

@@ -7,7 +7,7 @@ module mp_adder_TB();
   localparam OPERAND_WIDTH   = 128; 
   localparam ADDER_WIDTH     = 32; 
   
-  reg           rClk, rRst, rStart;
+  reg           rClk, rRst, rStart, rSub;
   reg [OPERAND_WIDTH-1:0]   rA, rB;
   
   wire [OPERAND_WIDTH:0]  wRes;
@@ -26,9 +26,9 @@ module mp_adder_TB();
     localparam RCACC = 4'b0111;
     localparam CCA   =  4'b1000;
   
-  mp_adder #( .OPERAND_WIDTH(OPERAND_WIDTH), .ADDER_WIDTH(ADDER_WIDTH), .BLOCK_WIDTH(8), .SUB_BLOCK_WIDTH(4), .ADDER_TYPE(CCA) )
+  mp_adder #( .OPERAND_WIDTH(OPERAND_WIDTH), .ADDER_WIDTH(ADDER_WIDTH), .BLOCK_WIDTH(8), .SUB_BLOCK_WIDTH(4), .ADDER_TYPE(CLA) )
   mp_adder_INST
-  ( .iClk(rClk), .iRst(rRst), .iStart(rStart), .iOpA(rA), .iOpB(rB), .oRes(wRes), .oDone(wDone) );
+  ( .iClk(rClk), .iRst(rRst), .iStart(rStart), .iSub(rSub), .iOpA(rA), .iOpB(rB), .oRes(wRes), .oDone(wDone) );
 
   // definition of clock period
   localparam  T = 20;  
@@ -48,16 +48,18 @@ module mp_adder_TB();
       rStart = 0;
       rA = 0;
       rB = 0;
+      rSub = 0;
       
       #(5*T);
       rRst = 0;
       #(5*T);
       
+      rSub = 1;
       rStart = 1;
-      rA <= 128'hffffffff_ffffffff_fffff0ff_0fffff00;
-      rB <= 128'hffffffff_fffff0ff_ffffffff_0fffffff;
+      rA <= 128'd10000000000000000000000000000;
+      rB <= 128'd5000000000000000000000000000;
       #T;
-      rExpectedResult = rA + rB;
+      rExpectedResult = rA - rB;
       rStart = 0;
             
       // wait until wDone is asserted     

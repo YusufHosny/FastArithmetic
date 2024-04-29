@@ -22,8 +22,8 @@
 
 module Multiply_Accumulator
 #(
-   parameter INPUT_LENGTH = 16,
-   parameter OUTPUT_LENGTH = 32
+   parameter INPUT_LENGTH = 32,
+   parameter OUTPUT_LENGTH = 64
 )
 (   
     input wire iClk, iRst,

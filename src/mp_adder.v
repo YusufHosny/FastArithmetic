@@ -16,6 +16,7 @@ module mp_adder #(
     input  wire                       iClk,
     input  wire                       iRst,
     input  wire                       iStart,
+    input  wire                       iSub,
     input  wire [OPERAND_WIDTH-1:0]   iOpA,
     input  wire [OPERAND_WIDTH-1:0]   iOpB,
     output wire [OPERAND_WIDTH:0]     oRes,  
@@ -52,6 +53,12 @@ module mp_adder #(
     
     // connect the output of the multiplexer to the input of register A
     assign regA_D = muxA_Out;
+    
+    // 2-input Multiplexer to choose between iB and its 2's comp value via input iSub
+    // the output is fed into one of the muxB_Out Multiplexer inputs
+    wire  [OPERAND_WIDTH-1:0] muxB_Sub_Out;
+    
+    assign muxB_Sub_Out = (iSub == 0) ? iOpB : ~iOpB;
 
     // Describe a 2-input Multiplexer for register B
     // It should select either of these two:
@@ -60,7 +67,7 @@ module mp_adder #(
     reg          muxB_sel;
     wire  [OPERAND_WIDTH-1:0] muxB_Out;
     
-    assign muxB_Out = (muxB_sel == 0) ? iOpB : { {ADDER_WIDTH{1'b0}}  , regB_Q[OPERAND_WIDTH-1:ADDER_WIDTH]};
+    assign muxB_Out = (muxB_sel == 0) ? muxB_Sub_Out : { {ADDER_WIDTH{1'b0}}  , regB_Q[OPERAND_WIDTH-1:ADDER_WIDTH]};
     
     // connect the output of the multiplexer to the input of register B
     assign regB_D = muxB_Out;
@@ -217,7 +224,7 @@ module mp_adder #(
     reg  muxCarry_sel;
     wire muxCarryIn;
 
-    assign muxCarryIn = (muxCarry_sel == 0) ? 1'b0 : regCout;
+    assign muxCarryIn = (muxCarry_sel == 0) ? iSub : regCout;
 
     // Connect the inputs of adder to the outputs of A and B registers
     // and to the carry mux
@@ -226,7 +233,8 @@ module mp_adder #(
     assign carry_in = muxCarryIn;
 
     // Describe the output signal oRes: it is the concatenation of output registers
-    assign oRes = { regCout, regResult};
+    // To avoid issues with the carry at the output, we want to ignore it when iSub is 1
+    assign oRes = { (~iSub & regCout), regResult};
 
     // FINITE STATE MACHINE
     
